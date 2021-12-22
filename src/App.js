@@ -30,7 +30,7 @@ function App(props) {
   //////////////////
 
   //api url
-  const url = "https://am-ringo-todos-backend.herokuapp.com/todos/";
+  const url = "https://to-do-ga.herokuapp.com/todos/"
 
   // state to hold list of todos
   const [posts, setPosts] = useState([]);
@@ -83,6 +83,16 @@ function App(props) {
     // get updated list of todos
     getTodos();
   }
+  // Function to edit todo on form submission
+  const deleteTodo = async (todo) => {
+    const response = await fetch(url + todo.id + "/", {
+      method: "delete",
+    });
+
+    // get updated list of todos
+    getTodos();
+    props.history.push("/");
+  };
   ///////////////
   // useEffects
   ///////////////
@@ -112,32 +122,33 @@ function App(props) {
         <Route
           path="/post/:id"
           render={(rp) => {
-            return <SinglePost 
-            {...rp} 
-            posts={posts} 
-            edit={getTargetTodo}
-          />;
+            return <SinglePost
+              {...rp}
+              posts={posts}
+              edit={getTargetTodo}
+              deleteTodo={deleteTodo}
+            />;
           }}
         />
         {/* NEW AND EDIT FORM PAGES */}
         <Route
           path="/new"
           render={(rp) => {
-            return <Form {...rp} 
-            initialTodo={nullTodo}
-            handleSubmit={addTodos}
-            buttonLabel="Add to my list"
-          />;
+            return <Form {...rp}
+              initialTodo={nullTodo}
+              handleSubmit={addTodos}
+              buttonLabel="Add to my list"
+            />;
           }}
         />
         <Route
           path="/edit"
           render={(rp) => {
-            return <Form 
-            {...rp} 
-            initialTodo={targetTodo}
-            handleSubmit={updateTodo}
-            buttonLabel="Edit"
+            return <Form
+              {...rp}
+              initialTodo={targetTodo}
+              handleSubmit={updateTodo}
+              buttonLabel="Edit"
             />;
           }}
         />

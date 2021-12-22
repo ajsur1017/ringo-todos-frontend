@@ -36,12 +36,14 @@ const Form = ({ initialTodo, handleSubmit, buttonLabel, history }) => {
         onChange={handleChange}
         value={formData.subject}
         name="subject"
+        placeholder="subject"
       />
       <input
         type="text"
         onChange={handleChange}
         value={formData.details}
         name="details"
+        placeholder="details"
       />
       <input type="submit" value={buttonLabel} />
     </form>
