@@ -7,7 +7,7 @@ import Form from "./pages/Form";
 import { useState, useEffect } from "react";
 
 // Import React Router Components
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Link } from "react-router-dom";
 
 function App(props) {
   ////////////
@@ -19,6 +19,12 @@ function App(props) {
     margin: "10px",
   };
 
+  const button = {
+    backgroundColor: "navy",
+    display: "block",
+    margin: "auto"
+  }
+
   //////////////////
   // State & Other Variables
   //////////////////
@@ -28,6 +34,16 @@ function App(props) {
 
   // state to hold list of todos
   const [posts, setPosts] = useState([]);
+
+  // an object that represents a null todo as a starting point
+  const nullTodo = {
+    subject: "",
+    details: "",
+  }
+
+  // const stat to hold todo for editing
+
+  const [targetTodo, setTargetTodo] = useState(nullTodo)
 
   ///////////////
   // Functions
@@ -39,6 +55,34 @@ function App(props) {
     setPosts(data)
   }
 
+  const addTodos = async (newTodo) => {
+    const response = await fetch(url, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newTodo),
+    })
+    getTodos();
+  }
+
+  const getTargetTodo = (todo) => {
+    setTargetTodo(todo);
+    props.history.push("/edit");
+  }
+
+  const updateTodo = async (todo) => {
+    const response = await fetch(url + todo.id + "/", {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(todo),
+    });
+
+    // get updated list of todos
+    getTodos();
+  }
   ///////////////
   // useEffects
   ///////////////
@@ -54,6 +98,7 @@ function App(props) {
   return (
     <div className="App">
       <h1 style={h1}>My Todo List</h1>
+      <Link to="/new"><button style={button}>Create New Todo</button></Link>
       <Switch>
         {/* INDEX PAGE */}
         <Route
@@ -67,20 +112,33 @@ function App(props) {
         <Route
           path="/post/:id"
           render={(rp) => {
-            return <SinglePost {...rp} posts={posts} />;
+            return <SinglePost 
+            {...rp} 
+            posts={posts} 
+            edit={getTargetTodo}
+          />;
           }}
         />
         {/* NEW AND EDIT FORM PAGES */}
         <Route
           path="/new"
           render={(rp) => {
-            return <Form {...rp} />;
+            return <Form {...rp} 
+            initialTodo={nullTodo}
+            handleSubmit={addTodos}
+            buttonLabel="Add to my list"
+          />;
           }}
         />
         <Route
           path="/edit"
           render={(rp) => {
-            return <Form {...rp} />;
+            return <Form 
+            {...rp} 
+            initialTodo={targetTodo}
+            handleSubmit={updateTodo}
+            buttonLabel="Edit"
+            />;
           }}
         />
       </Switch>
